@@ -43,8 +43,9 @@ export default function VisionCamera() {
       if (frame.pixelFormat !== 'yuv') return;
 
 
-      const buffer = frame.toArrayBuffer();
-      const data = new Uint8Array(buffer);
+      try {
+        const buffer = frame.toArrayBuffer();
+        const data = new Uint8Array(buffer);
 
       const width = frame.width;
       const height = frame.height;
@@ -63,7 +64,7 @@ export default function VisionCamera() {
         // Calculate index for the pixel at (centerX, y) Y-plane data is at the start of the buffer.
         const index = y * stride + centerX;
         
-        if (index < data.length) {
+        if (index < data.length && index >= 0) {
           const luminance = data[index];
           samples.push(luminance);
           luminanceSum += luminance;
@@ -82,6 +83,10 @@ export default function VisionCamera() {
       }
 
       detectedBits.value = binaryString.substring(0, 50); // Show first 50 chunks
+      } catch (error) {
+        // Handle any frame processing errors gracefully
+        detectedBits.value = "Processing error";
+      }
     });
   }, [detectedBits]);
 
