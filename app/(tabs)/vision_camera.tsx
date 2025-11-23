@@ -35,11 +35,11 @@ export default function VisionCamera() {
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet';
 
-    // OPTIMIZATION: Run analysis at 15-30 FPS to save battery, although Rolling Shutter capture happens at the sensor read speed.
+    //Running 15-30 FPS to save battery, although Rolling Shutter capture happens at the sensor read speed.
     runAtTargetFps(15, () => {
       'worklet';
       
-      // using YUV (NV21/YUV_420_888 on Android) , YUV is much faster because we only need the Y (Luminance) plane.
+      //we only need the Y (Luminance) plane.
       if (frame.pixelFormat !== 'yuv') return;
 
 
@@ -81,10 +81,6 @@ export default function VisionCamera() {
         binaryString += val > threshold ? "|" : ".";
       }
 
-      // 6. OUTPUT
-      // Update the shared value. 
-      // In a real app, you would parse this 'binaryString' looking for 
-      // Manchester transitions (0->1 or 1->0).
       detectedBits.value = binaryString.substring(0, 50); // Show first 50 chunks
     });
   }, [detectedBits]);
@@ -122,10 +118,7 @@ export default function VisionCamera() {
         device={device}
         isActive={true}
         frameProcessor={frameProcessor}
-        pixelFormat="yuv" // Must be YUV for efficiency
-        // Note: exposure prop is used for exposure compensation (bias)
-        // Range: device.minExposure to device.maxExposure
-        // For manual control, you'd need format with specific capabilities
+        pixelFormat="yuv"
         exposure={-1}
       />
       
